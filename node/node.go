@@ -1,7 +1,7 @@
 package node
 
 type Node interface {
-	Solve(done chan bool)
+	Solve()
 	GetInputs() []Port
 	GetOutputs() []Port
 	GetId() string

@@ -3,6 +3,7 @@ package core
 import (
 	"log"
 	"reflect"
+	"sync"
 	"time"
 
 	"github.com/moethu/gocodegraph/node"
@@ -41,7 +42,7 @@ func Solve(nodes []node.Node, verbose bool) {
 func solve(nodes []node.Node, verbose bool) {
 
 	rest := []node.Node{}
-	done := make(chan bool)
+	run := []node.Node{}
 
 	for _, n := range nodes {
 
@@ -58,22 +59,35 @@ func solve(nodes []node.Node, verbose bool) {
 		}
 
 		if ready {
-			go n.Solve(done)
-			<-done
-
-			if verbose {
-				printNode(n)
-			}
-			for _, p := range n.GetOutputs() {
-				for _, e := range p.Outgoing {
-					e.Propagate()
-				}
-			}
+			run = append(run, n)
 		} else {
 			if connected {
 				rest = append(rest, n)
 			}
 		}
+	}
+
+	if len(run) > 0 {
+		var wg sync.WaitGroup
+
+		for i, n := range run {
+			wg.Add(1)
+			go func(i int, n node.Node) {
+				defer wg.Done()
+				log.Println(i)
+				n.Solve()
+				if verbose {
+					printNode(n)
+				}
+				for _, p := range n.GetOutputs() {
+					for _, e := range p.Outgoing {
+						e.Propagate()
+					}
+				}
+			}(i, n)
+		}
+
+		wg.Wait()
 	}
 
 	if len(rest) > 0 {
