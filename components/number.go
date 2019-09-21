@@ -1,10 +1,9 @@
 package components
 
 import (
-	"math/rand"
 	"reflect"
-	"strconv"
 
+	"github.com/satori/go.uuid"
 	"github.com/moethu/gocodegraph/node"
 )
 
@@ -21,7 +20,7 @@ func (n *Number) Solve() {
 }
 
 func (n *Number) Init() {
-	n.Id = strconv.Itoa(rand.Intn(100))
+	n.Id = uuid.NewV4().String()
 	p3 := node.NewPort(n, "constant", reflect.Int)
 	n.Inputs = []node.Port{}
 	n.Outputs = []node.Port{p3}

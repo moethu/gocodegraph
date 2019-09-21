@@ -22,7 +22,7 @@ func main() {
 	// draw edges to connect components
 	node.NewEdge(&num1.Outputs[0], &add.Inputs[0])
 	node.NewEdge(&num2.Outputs[0], &add.Inputs[1])
-	node.NewEdge(&add.Outputs[0], &add2.Inputs[1])
+	node.NewEdge(&num1.Outputs[0], &add2.Inputs[1])
 	node.NewEdge(&num2.Outputs[0], &add2.Inputs[0])
 
 	// solve graph
