@@ -1,9 +1,9 @@
 package main
 
 import (
-	"./components"
-	"./core"
-	"./node"
+	"github.com/moethu/gocodegraph/components"
+	"github.com/moethu/gocodegraph/core"
+	"github.com/moethu/gocodegraph/node"
 )
 
 func main() {

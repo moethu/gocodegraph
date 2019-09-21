@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"../node"
+	"github.com/moethu/gocodegraph/node"
 )
 
 type Number struct {

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	"../node"
+	"github.com/moethu/gocodegraph/node"
 )
 
 func Init(nodes []node.Node) {
