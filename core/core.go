@@ -41,6 +41,7 @@ func Solve(nodes []node.Node, verbose bool) {
 func solve(nodes []node.Node, verbose bool) {
 
 	rest := []node.Node{}
+	done := make(chan bool)
 
 	for _, n := range nodes {
 
@@ -57,7 +58,9 @@ func solve(nodes []node.Node, verbose bool) {
 		}
 
 		if ready {
-			n.Solve()
+			go n.Solve(done)
+			<-done
+
 			if verbose {
 				printNode(n)
 			}

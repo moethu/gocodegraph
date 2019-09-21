@@ -16,9 +16,9 @@ type Number struct {
 	Position node.Location
 }
 
-func (n *Number) Solve() bool {
+func (n *Number) Solve(done chan bool) {
 	n.Outputs[0].SetValue(n.Value)
-	return true
+	done <- true
 }
 
 func (n *Number) Init() {

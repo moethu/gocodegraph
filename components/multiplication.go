@@ -28,11 +28,11 @@ func (n *Multiplication) GetPosition() node.Location {
 	return n.Position
 }
 
-func (n *Multiplication) Solve() bool {
+func (n *Multiplication) Solve(done chan bool) {
 	a := n.Inputs[0].GetValue().(int)
 	b := n.Inputs[1].GetValue().(int)
 	n.Outputs[0].SetValue(a * b)
-	return true
+	done <- true
 }
 
 func (n *Multiplication) GetId() string {

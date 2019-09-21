@@ -28,11 +28,11 @@ func (n *Addition) GetPosition() node.Location {
 	return n.Position
 }
 
-func (n *Addition) Solve() bool {
+func (n *Addition) Solve(done chan bool) {
 	a := n.Inputs[0].GetValue().(int)
 	b := n.Inputs[1].GetValue().(int)
 	n.Outputs[0].SetValue(a + b)
-	return true
+	done <- true
 }
 
 func (n *Addition) GetId() string {
