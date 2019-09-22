@@ -14,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/moethu/gocodegraph/components"
+	"github.com/moethu/gocodegraph/core"
 	"github.com/moethu/gocodegraph/node"
 )
 
@@ -97,46 +98,71 @@ func solve(c *gin.Context) {
 		return
 	}
 
-	mapOperators(payload["operators"])
-	mapLinks(payload["links"])
+	nodes := mapOperators(payload["operators"])
+	mapLinks(payload["links"], nodes)
+	ns := []node.Node{}
+	for _, value := range nodes {
+		ns = append(ns, value)
+	}
+	core.Solve(ns, true)
+	// TODO collect result map from nodes and return
+	c.JSON(200, gin.H{"status": "OK"})
 }
 
-func mapOperators(data interface{}) []node.Node {
-	nodes := []node.Node{}
+func mapOperators(data interface{}) map[string]node.Node {
+	nodes := make(map[string]node.Node)
 	d := data.(map[string]interface{})
 	for id, operator := range d {
-		log.Println(id)
 		op := operator.(map[string]interface{})
 		prop := op["properties"].(map[string]interface{})
 		in := prop["inputs"].(map[string]interface{})
 		out := prop["outputs"].(map[string]interface{})
-		log.Println(prop["title"], in, out)
-		mapPorts(in)
-		mapPorts(out)
 
+		var n node.Node
 		switch prop["title"] {
 		case "Addition":
-			add := components.Addition{}
-			nodes = append(nodes, &add)
+			n = &components.Addition{}
 		case "Number":
-			n := components.Number{Value: 3}
-			nodes = append(nodes, &n)
+			n = &components.Number{Value: 3}
 		}
+		n.Init()
+		mapPorts(in, n, true)
+		mapPorts(out, n, false)
+		nodes[id] = n
 	}
 	return nodes
 }
 
-func mapPorts(data map[string]interface{}) {
+func mapPorts(data map[string]interface{}, node node.Node, in bool) {
+	ctr := 0
 	for id, _ := range data {
-		log.Println(id)
+		if in {
+			node.GetInput(ctr).Name = id
+		} else {
+			node.GetOutput(ctr).Name = id
+		}
+		ctr++
 	}
 }
 
-func mapLinks(data interface{}) {
+func mapLinks(data interface{}, nodes map[string]node.Node) {
 	d := data.(map[string]interface{})
 	for _, link := range d {
-		//op := operator.(map[string]interface{})
-		//node.NewEdge(&num1.Outputs[0], &add.Inputs[0])
-		log.Println(link)
+		op := link.(map[string]interface{})
+		n1 := nodes[op["fromOperator"].(string)]
+		n2 := nodes[op["toOperator"].(string)]
+		var p1 *node.Port
+		var p2 *node.Port
+		for i, port := range n1.GetOutputs() {
+			if port.Name == op["fromConnector"] {
+				p1 = n1.GetOutput(i)
+			}
+		}
+		for i, port := range n2.GetInputs() {
+			if port.Name == op["toConnector"] {
+				p2 = n2.GetInput(i)
+			}
+		}
+		node.NewEdge(p1, p2)
 	}
 }

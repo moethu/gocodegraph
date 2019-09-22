@@ -2,7 +2,6 @@ package components
 
 import (
 	"reflect"
-	"time"
 
 	"github.com/moethu/gocodegraph/node"
 	uuid "github.com/satori/go.uuid"
@@ -31,8 +30,6 @@ func (n *Addition) GetPosition() node.Location {
 func (n *Addition) Solve() {
 	a := n.Inputs[0].GetValue().(int)
 	b := n.Inputs[1].GetValue().(int)
-	time.Sleep(5 * time.Second)
-
 	n.Outputs[0].SetValue(a + b)
 }
 
@@ -45,4 +42,11 @@ func (n *Addition) GetInputs() []node.Port {
 
 func (n *Addition) GetOutputs() []node.Port {
 	return n.Outputs
+}
+func (n *Addition) GetInput(i int) *node.Port {
+	return &n.Inputs[i]
+}
+
+func (n *Addition) GetOutput(i int) *node.Port {
+	return &n.Outputs[i]
 }
