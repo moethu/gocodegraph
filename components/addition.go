@@ -1,15 +1,14 @@
 package components
 
 import (
-	"math/rand"
 	"reflect"
-	"strconv"
 
 	"github.com/moethu/gocodegraph/node"
+	uuid "github.com/satori/go.uuid"
 )
 
 func (n *Addition) Init() {
-	n.Id = strconv.Itoa(rand.Intn(100))
+	n.Id = uuid.NewV4().String()
 	p1 := node.NewPort(n, "a", reflect.Int)
 	p2 := node.NewPort(n, "b", reflect.Int)
 	p3 := node.NewPort(n, "result", reflect.Int)
@@ -28,11 +27,10 @@ func (n *Addition) GetPosition() node.Location {
 	return n.Position
 }
 
-func (n *Addition) Solve(done chan bool) {
+func (n *Addition) Solve() {
 	a := n.Inputs[0].GetValue().(int)
 	b := n.Inputs[1].GetValue().(int)
 	n.Outputs[0].SetValue(a + b)
-	done <- true
 }
 
 func (n *Addition) GetId() string {
@@ -44,4 +42,11 @@ func (n *Addition) GetInputs() []node.Port {
 
 func (n *Addition) GetOutputs() []node.Port {
 	return n.Outputs
+}
+func (n *Addition) GetInput(i int) *node.Port {
+	return &n.Inputs[i]
+}
+
+func (n *Addition) GetOutput(i int) *node.Port {
+	return &n.Outputs[i]
 }

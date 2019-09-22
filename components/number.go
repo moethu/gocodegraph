@@ -1,11 +1,10 @@
 package components
 
 import (
-	"math/rand"
 	"reflect"
-	"strconv"
 
 	"github.com/moethu/gocodegraph/node"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Number struct {
@@ -16,13 +15,12 @@ type Number struct {
 	Position node.Location
 }
 
-func (n *Number) Solve(done chan bool) {
+func (n *Number) Solve() {
 	n.Outputs[0].SetValue(n.Value)
-	done <- true
 }
 
 func (n *Number) Init() {
-	n.Id = strconv.Itoa(rand.Intn(100))
+	n.Id = uuid.NewV4().String()
 	p3 := node.NewPort(n, "constant", reflect.Int)
 	n.Inputs = []node.Port{}
 	n.Outputs = []node.Port{p3}
@@ -42,4 +40,11 @@ func (n *Number) GetInputs() []node.Port {
 
 func (n *Number) GetOutputs() []node.Port {
 	return n.Outputs
+}
+func (n *Number) GetInput(i int) *node.Port {
+	return &n.Inputs[i]
+}
+
+func (n *Number) GetOutput(i int) *node.Port {
+	return &n.Outputs[i]
 }

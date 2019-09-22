@@ -32,9 +32,7 @@ func (p *Port) AddIncomingEdge(e *Edge) {
 }
 
 func resolve(n Node) {
-	done := make(chan bool)
-	n.Solve(done)
-	<-done
+	n.Solve()
 	for _, p := range n.GetOutputs() {
 		for _, o := range p.Outgoing {
 			o.Propagate()

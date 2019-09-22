@@ -1,9 +1,11 @@
 package node
 
 type Node interface {
-	Solve(done chan bool)
+	Solve()
 	GetInputs() []Port
 	GetOutputs() []Port
+	GetInput(i int) *Port
+	GetOutput(i int) *Port
 	GetId() string
 	GetPosition() Location
 	Init()
