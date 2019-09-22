@@ -3,8 +3,8 @@ package components
 import (
 	"reflect"
 
-	"github.com/satori/go.uuid"
 	"github.com/moethu/gocodegraph/node"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Number struct {
@@ -40,4 +40,11 @@ func (n *Number) GetInputs() []node.Port {
 
 func (n *Number) GetOutputs() []node.Port {
 	return n.Outputs
+}
+func (n *Number) GetInput(i int) *node.Port {
+	return &n.Inputs[i]
+}
+
+func (n *Number) GetOutput(i int) *node.Port {
+	return &n.Outputs[i]
 }

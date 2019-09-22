@@ -74,7 +74,6 @@ func solve(nodes []node.Node, verbose bool) {
 			wg.Add(1)
 			go func(i int, n node.Node) {
 				defer wg.Done()
-				log.Println(i)
 				n.Solve()
 				if verbose {
 					printNode(n)
