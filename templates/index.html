@@ -75,13 +75,13 @@
     $('#example').flowchart({
         data: data
     });
-
-    $('#solve').click({
-       var djson = JSON.stringify(data); 
-       // $.post("{{.}}/solve",djson, function(data, status){
-       //     alert("Data: " + data + "\nStatus: " + status);
-       // });
-    });
+    
+    $("#solve").click(function() { 
+        let djson = JSON.stringify(data);
+        $.post("{{.}}/solve",djson, function(data, status){
+            console.log("Data: " + data + "\nStatus: " + status);
+        });
+    }); 
     });
     </script>
 </body>

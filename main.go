@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/moethu/gocodegraph/components"
+	"github.com/moethu/gocodegraph/node"
 )
 
 func main() {
@@ -82,12 +84,11 @@ func main() {
 // Home route, loading template and serving it
 func home(c *gin.Context) {
 	viewertemplate := template.Must(template.ParseFiles("templates/index.html"))
-
 	viewertemplate.Execute(c.Writer, "http://localhost:8000")
 }
 
 func solve(c *gin.Context) {
-	var payload interface{}
+	var payload map[string]interface{}
 	bdata, _ := c.GetRawData()
 	err := json.Unmarshal(bdata, &payload)
 	if err != nil {
@@ -95,5 +96,47 @@ func solve(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "error deserializing json"})
 		return
 	}
-	log.Println(payload)
+
+	mapOperators(payload["operators"])
+	mapLinks(payload["links"])
+}
+
+func mapOperators(data interface{}) []node.Node {
+	nodes := []node.Node{}
+	d := data.(map[string]interface{})
+	for id, operator := range d {
+		log.Println(id)
+		op := operator.(map[string]interface{})
+		prop := op["properties"].(map[string]interface{})
+		in := prop["inputs"].(map[string]interface{})
+		out := prop["outputs"].(map[string]interface{})
+		log.Println(prop["title"], in, out)
+		mapPorts(in)
+		mapPorts(out)
+
+		switch prop["title"] {
+		case "Addition":
+			add := components.Addition{}
+			nodes = append(nodes, &add)
+		case "Number":
+			n := components.Number{Value: 3}
+			nodes = append(nodes, &n)
+		}
+	}
+	return nodes
+}
+
+func mapPorts(data map[string]interface{}) {
+	for id, _ := range data {
+		log.Println(id)
+	}
+}
+
+func mapLinks(data interface{}) {
+	d := data.(map[string]interface{})
+	for _, link := range d {
+		//op := operator.(map[string]interface{})
+		//node.NewEdge(&num1.Outputs[0], &add.Inputs[0])
+		log.Println(link)
+	}
 }
