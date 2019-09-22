@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="{{.}}/static/jquery.flowchart.css" rel="stylesheet">
+</head>
+<body>
+    <div class="flowchart-example-container" id="example"></div>
+    <button id="solve" value="test">test</button>
+    <script src="{{.}}/static/jquery.js"></script>
+    <script src="{{.}}/static/jquery-ui.min.js"></script>
+    <script src="{{.}}/static/jquery.flowchart.js"></script>
+    <script>
+    $(document).ready(function() {
+    var data = {
+      operators: {
+        operator1: {
+          top: 20,
+          left: 20,
+          properties: {
+            title: 'Number',
+            inputs: {},
+            outputs: {
+              output_1: {
+                label: 'O',
+              }
+            }
+          }
+        },
+        operator2: {
+          top: 80,
+          left: 300,
+          properties: {
+            title: 'Addition',
+            inputs: {
+              input_1: {
+                label: 'Input 1',
+              },
+              input_2: {
+                label: 'Input 2',
+              },
+            },
+            outputs: {}
+          }
+        },
+        operator3: {
+          top: 70,
+          left: 20,
+          properties: {
+            title: 'Number',
+            inputs: {},
+            outputs: {
+              output_1: {
+                label: 'O',
+              }
+            }
+          }
+        },
+      },
+      links: {
+        link_1: {
+          fromOperator: 'operator1',
+          fromConnector: 'output_1',
+          toOperator: 'operator2',
+          toConnector: 'input_2',
+        },
+        link_2: {
+          fromOperator: 'operator3',
+          fromConnector: 'output_1',
+          toOperator: 'operator2',
+          toConnector: 'input_1',
+        },
+      }
+    };
+
+    $('#example').flowchart({
+        data: data
+    });
+
+    $('#solve').click({
+       var djson = JSON.stringify(data); 
+       // $.post("{{.}}/solve",djson, function(data, status){
+       //     alert("Data: " + data + "\nStatus: " + status);
+       // });
+    });
+    });
+    </script>
+</body>
+</html>
