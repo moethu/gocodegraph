@@ -20,6 +20,7 @@ func (n *Number) Solve() {
 }
 
 func (n *Number) Init() {
+	n.Value = 5
 	n.Id = uuid.NewV4().String()
 	p3 := node.NewPort(n, "constant", reflect.Int)
 	n.Inputs = []node.Port{}

@@ -19,6 +19,7 @@ import (
 )
 
 func main() {
+	components.InitTypeRegistry()
 
 	flag.Parse()
 	log.SetFlags(0)
@@ -34,6 +35,7 @@ func main() {
 
 	router.Static("/static/", "./static/")
 	router.GET("/", home)
+	router.GET("/nodes", nodes)
 	router.POST("/solve", solve)
 	log.Println("Starting HTTP Server on Port 8000")
 
@@ -98,13 +100,8 @@ func mapOperators(data interface{}) map[string]node.Node {
 		in := prop["inputs"].(map[string]interface{})
 		out := prop["outputs"].(map[string]interface{})
 
-		var n node.Node
-		switch prop["title"] {
-		case "Addition":
-			n = &components.Addition{}
-		case "Number":
-			n = &components.Number{Value: 3}
-		}
+		n := components.MakeInstance("components." + prop["title"].(string))
+
 		n.Init()
 		mapPorts(in, n, true)
 		mapPorts(out, n, false)
@@ -145,4 +142,9 @@ func mapLinks(data interface{}, nodes map[string]node.Node) {
 		}
 		node.NewEdge(p1, p2)
 	}
+}
+
+func nodes(c *gin.Context) {
+	list := components.GetComponents()
+	c.JSON(200, gin.H{"components": list})
 }
