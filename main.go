@@ -95,6 +95,21 @@ func solve(c *gin.Context) {
 	// solve graph
 	core.Solve(ns, true)
 
+	// wait for graph to be solved (runs async)
+	// TODO: open websocket for results and stream live results to UI
+	time.Sleep(1)
+
+	// retrieve results
+	results := make(map[string]interface{})
+	for _, n := range ns {
+		var data []interface{}
+		for _, p := range n.GetOutputs() {
+			data = append(data, p.GetValue())
+		}
+		results[n.GetId()] = data
+	}
+
+	log.Println(results)
 	// TODO: collect result map from nodes and return
 	c.JSON(200, gin.H{"status": "OK"})
 }

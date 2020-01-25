@@ -28,8 +28,8 @@ func (n *Multiplication) GetPosition() node.Location {
 }
 
 func (n *Multiplication) Solve() {
-	a := n.Inputs[0].GetValue().(int)
-	b := n.Inputs[1].GetValue().(int)
+	a := n.Inputs[0].AwaitValue().(int)
+	b := n.Inputs[1].AwaitValue().(int)
 	n.Outputs[0].SetValue(a * b)
 }
 

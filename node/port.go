@@ -59,8 +59,13 @@ func (p *Port) GetIncomingChannel(edge int) (error, chan interface{}) {
 	}
 }
 
-// GetValue awaits the value of a channel
+// GetValue returns the ports value
 func (p *Port) GetValue() interface{} {
+	return p.value
+}
+
+// AwaitValue awaits the value of a channel
+func (p *Port) AwaitValue() interface{} {
 	log.Println("awaiting value")
 	return <-p.Incoming[0].Channel
 }
