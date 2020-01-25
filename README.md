@@ -1,13 +1,7 @@
 # gocodegraph
 
 gocodegraph is an engine for a visual coding environment in go.
-Currently it consists of a simple backend solving the graph by starting with nodes that do not have any inputs. Once they are solved we move on to the next node which has all inputs present and therefore can be solved. And so on.
+The current implementation first initializes all nodes which do require inputs. It uses channels to represent edges of the graph ```Channel chan interface{}```, so each of the nodes is awaiting inputs with channels.
+It then initializes all nodes which do not require inputs, which are ready to be solved. Once solved, they are propagating their results down the line through channels. If all channels of a node received data it can be solved and it will send its result down the line, and so on.
 
 ![alt text](https://github.com/moethu/gocodegraph/raw/master/images/screenshot.png)
-
-To Implement:
-- Route for list of available nodes
-- Display available nodes in UI
-- Drag to Scene
-- Connect and Run
-- Feed result back into nodes
