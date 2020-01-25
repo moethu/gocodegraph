@@ -1,6 +1,8 @@
 package components
 
 import (
+	"fmt"
+	"log"
 	"reflect"
 
 	"github.com/moethu/gocodegraph/node"
@@ -28,9 +30,12 @@ func (n *Addition) GetPosition() node.Location {
 }
 
 func (n *Addition) Solve() {
-	a := n.Inputs[0].GetValue().(int)
-	b := n.Inputs[1].GetValue().(int)
-	n.Outputs[0].SetValue(a + b)
+	log.Println("Awaiting Values from Channel")
+	_, c1 := n.Inputs[0].GetIncomingChannel(0)
+	_, c2 := n.Inputs[1].GetIncomingChannel(0)
+	a, b := <-c1, <-c2
+	log.Println(fmt.Sprintf("Solving %v + %v", a, b))
+	n.Outputs[0].SetValue(a.(int) + b.(int))
 }
 
 func (n *Addition) GetId() string {

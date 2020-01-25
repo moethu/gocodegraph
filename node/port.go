@@ -1,6 +1,8 @@
 package node
 
 import (
+	"errors"
+	"log"
 	"reflect"
 )
 
@@ -31,28 +33,27 @@ func (p *Port) AddIncomingEdge(e *Edge) {
 	p.Incoming = append(p.Incoming, e)
 }
 
-func resolve(n Node) {
-	n.Solve()
-	for _, p := range n.GetOutputs() {
-		for _, o := range p.Outgoing {
-			o.Propagate()
-			resolve(o.To.Parent)
-		}
+func (p *Port) SetValue(val interface{}) {
+	p.value = val
+	p.HasValue = true
+	for _, e := range p.Outgoing {
+		e.Propagate(val)
 	}
 }
 
-func (p *Port) SetValue(val interface{}) {
-	if p.HasValue {
-		// invalidate all dependencies
-		for _, o := range p.Outgoing {
-			o.Propagate()
-			resolve(o.To.Parent)
-		}
+func (p *Port) GetIncomingEdges() []*Edge {
+	return p.Incoming
+}
+
+func (p *Port) GetIncomingChannel(edge int) (error, chan interface{}) {
+	if len(p.Incoming) > edge {
+		return nil, p.Incoming[edge].Channel
+	} else {
+		return errors.New("Out of bounds"), nil
 	}
-	p.value = val
-	p.HasValue = true
 }
 
 func (p *Port) GetValue() interface{} {
-	return p.value
+	log.Println("awaiting value")
+	return <-p.Incoming[0].Channel
 }

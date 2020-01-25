@@ -35,7 +35,7 @@ func main() {
 
 	router.Static("/static/", "./static/")
 	router.GET("/", home)
-	router.GET("/nodes", nodes)
+	router.GET("/components", nodes)
 	router.POST("/solve", solve)
 	log.Println("Starting HTTP Server on Port 8000")
 
@@ -74,6 +74,7 @@ func solve(c *gin.Context) {
 	var payload map[string]interface{}
 	bdata, _ := c.GetRawData()
 	err := json.Unmarshal(bdata, &payload)
+	log.Println(payload)
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, gin.H{"error": "error deserializing json"})
@@ -146,5 +147,8 @@ func mapLinks(data interface{}, nodes map[string]node.Node) {
 
 func nodes(c *gin.Context) {
 	list := components.GetComponents()
-	c.JSON(200, gin.H{"components": list})
+	res, _ := json.Marshal(list)
+	st := string(res)
+	log.Println(st)
+	c.JSON(200, st)
 }
