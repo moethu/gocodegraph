@@ -1,88 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{.}}/static/bootstrap.min.css">
     <link href="{{.}}/static/jquery.flowchart.css" rel="stylesheet">
+    <link href="{{.}}/static/dashboard.css" rel="stylesheet">
 </head>
 <body>
-    <div class="flowchart-example-container" id="example"></div>
-    <button id="solve" value="test">test</button>
     <script src="{{.}}/static/jquery.js"></script>
     <script src="{{.}}/static/jquery-ui.min.js"></script>
     <script src="{{.}}/static/jquery.flowchart.js"></script>
+    <script src="{{.}}/static/popper.min.js" crossorigin="anonymous"></script>
+    <script src="{{.}}/static/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="{{.}}/static/gocodegraph.js"></script>
+
+   <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">gocodegraph</a>
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column" id="components">
+             
+            </ul>
+          </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Canvas</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+              <div class="btn-group mr-2">
+                <button id="solve"  class="btn btn-sm btn-outline-secondary">Run</button>
+                <button class="btn btn-sm btn-outline-secondary">Export</button>
+              </div>
+            </div>
+          </div>
+          <div class="flowchart-example-container" id="example"></div>
+          </canvas>
+        </main>
+      </div>
+    </div>
+
     <script>
     $(document).ready(function() {
-    var data = {
-      operators: {
-        operator1: {
-          top: 20,
-          left: 20,
-          properties: {
-            title: 'Number',
-            inputs: {},
-            outputs: {
-              output_1: {
-                label: 'O',
-              }
-            }
-          }
-        },
-        operator2: {
-          top: 80,
-          left: 300,
-          properties: {
-            title: 'Addition',
-            inputs: {
-              input_1: {
-                label: 'Input 1',
-              },
-              input_2: {
-                label: 'Input 2',
-              },
-            },
-            outputs: {}
-          }
-        },
-        operator3: {
-          top: 70,
-          left: 20,
-          properties: {
-            title: 'Number',
-            inputs: {},
-            outputs: {
-              output_1: {
-                label: 'O',
-              }
-            }
-          }
-        },
-      },
-      links: {
-        link_1: {
-          fromOperator: 'operator1',
-          fromConnector: 'output_1',
-          toOperator: 'operator2',
-          toConnector: 'input_2',
-        },
-        link_2: {
-          fromOperator: 'operator3',
-          fromConnector: 'output_1',
-          toOperator: 'operator2',
-          toConnector: 'input_1',
-        },
-      }
-    };
-
-    $('#example').flowchart({
-        data: data
-    });
-    
-    $("#solve").click(function() { 
-        let djson = JSON.stringify(data);
-        $.post("{{.}}/solve",djson, function(data, status){
-            console.log("Data: " + data + "\nStatus: " + status);
-        });
-    }); 
-    });
-    </script>
+      load()
+    })
+      </script>
 </body>
 </html>
