@@ -64,34 +64,42 @@ func main() {
 	log.Println("Server exiting")
 }
 
-// Home route, loading template and serving it
+// home rendering main page
 func home(c *gin.Context) {
 	viewertemplate := template.Must(template.ParseFiles("templates/index.html"))
 	viewertemplate.Execute(c.Writer, "http://localhost:8000")
 }
 
+// solve solves the graph based on a json input
+// TODO: minimalize input from UI
 func solve(c *gin.Context) {
 	var payload map[string]interface{}
 	bdata, _ := c.GetRawData()
 	err := json.Unmarshal(bdata, &payload)
-	log.Println(payload)
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, gin.H{"error": "error deserializing json"})
 		return
 	}
 
+	// generate nodes
 	nodes := mapOperators(payload["operators"])
+
+	// generate links
 	mapLinks(payload["links"], nodes)
 	ns := []node.Node{}
 	for _, value := range nodes {
 		ns = append(ns, value)
 	}
+
+	// solve graph
 	core.Solve(ns, true)
-	// TODO collect result map from nodes and return
+
+	// TODO: collect result map from nodes and return
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
+// mapOperators maps json operators to graph components
 func mapOperators(data interface{}) map[string]node.Node {
 	nodes := make(map[string]node.Node)
 	d := data.(map[string]interface{})
@@ -111,6 +119,7 @@ func mapOperators(data interface{}) map[string]node.Node {
 	return nodes
 }
 
+// mapPorts maps json ports to graph ports
 func mapPorts(data map[string]interface{}, node node.Node, in bool) {
 	ctr := 0
 	for id, _ := range data {
@@ -123,6 +132,7 @@ func mapPorts(data map[string]interface{}, node node.Node, in bool) {
 	}
 }
 
+// mapLinks maps json links to graph links by creating edges
 func mapLinks(data interface{}, nodes map[string]node.Node) {
 	d := data.(map[string]interface{})
 	for _, link := range d {
@@ -145,10 +155,10 @@ func mapLinks(data interface{}, nodes map[string]node.Node) {
 	}
 }
 
+// nodes returns a list of available components
 func nodes(c *gin.Context) {
 	list := components.GetComponents()
 	res, _ := json.Marshal(list)
 	st := string(res)
-	log.Println(st)
 	c.JSON(200, st)
 }

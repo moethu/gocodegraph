@@ -8,12 +8,14 @@ import (
 	"github.com/moethu/gocodegraph/node"
 )
 
+// Init initializes all nodes
 func Init(nodes []node.Node) {
 	for _, n := range nodes {
 		n.Init()
 	}
 }
 
+// printNode helps to print the definition and values of a node
 func printNode(n node.Node) {
 	log.Println(" -- ", n.GetId(), reflect.TypeOf(n))
 	log.Println("     Position", n.GetPosition())
@@ -27,6 +29,7 @@ func printNode(n node.Node) {
 	}
 }
 
+// Solve solves the entire graph
 func Solve(nodes []node.Node, verbose bool) {
 	start := time.Now()
 
@@ -38,13 +41,13 @@ func Solve(nodes []node.Node, verbose bool) {
 	}
 }
 
+// solve is an internal function first solving all nodes awaiting inputs
+// while those nodes are opening channels to await input from nodes which don't require inputs
 func solve(nodes []node.Node, verbose bool) {
-
 	rest := []node.Node{}
 	run := []node.Node{}
 
 	for _, n := range nodes {
-
 		ready := true
 		connected := true
 
@@ -68,11 +71,11 @@ func solve(nodes []node.Node, verbose bool) {
 
 	for _, n := range rest {
 		go n.Solve()
-		time.Sleep(3 * time.Second)
 	}
+
+	// TODO: should check if all nodes are initialized and awaiting input
 
 	for _, n := range run {
 		go n.Solve()
 	}
-
 }

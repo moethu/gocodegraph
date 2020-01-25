@@ -2,26 +2,33 @@ package components
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 
 	"github.com/moethu/gocodegraph/node"
 )
 
+// typeregistry for available node types
 var typeRegistry = make(map[string]reflect.Type)
 
+// InitTypeRegistry loads all available nodes into the registry
+// TODO: should use reflection to get implemented types
 func InitTypeRegistry() {
 	myTypes := []interface{}{Addition{}, Multiplication{}, Number{}}
 	for _, v := range myTypes {
+		log.Println("Loading", reflect.TypeOf(v))
 		typeRegistry[fmt.Sprintf("%T", v)] = reflect.TypeOf(v)
 	}
 }
 
+// MakeInstance creates a component by name
 func MakeInstance(name string) node.Node {
 	v := reflect.New(typeRegistry[name])
 	n := v.Interface().(node.Node)
 	return n
 }
 
+// GetComponents returns a list of all available components and their properties
 func GetComponents() []Comp {
 	keys := make([]Comp, len(typeRegistry))
 

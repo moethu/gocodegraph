@@ -18,6 +18,7 @@ type Port struct {
 	Optional bool
 }
 
+// NewPort creates a new port
 func NewPort(parent Node, name string, kind reflect.Kind) Port {
 	p := Port{Parent: parent, Name: name, Type: kind, HasValue: false}
 	p.Outgoing = []Edge{}
@@ -25,14 +26,17 @@ func NewPort(parent Node, name string, kind reflect.Kind) Port {
 	return p
 }
 
+// AddOutgoingEdge adds an edge to a port as outgoing
 func (p *Port) AddOutgoingEdge(e Edge) {
 	p.Outgoing = append(p.Outgoing, e)
 }
 
+// AddIncomingEdge adds and edge to a port as incoming
 func (p *Port) AddIncomingEdge(e *Edge) {
 	p.Incoming = append(p.Incoming, e)
 }
 
+// SetValue sets a ports value and propagates it down the line
 func (p *Port) SetValue(val interface{}) {
 	p.value = val
 	p.HasValue = true
@@ -41,10 +45,12 @@ func (p *Port) SetValue(val interface{}) {
 	}
 }
 
+// GetIncomingEdges returns all incoming edges
 func (p *Port) GetIncomingEdges() []*Edge {
 	return p.Incoming
 }
 
+// GetIncomingChannel gets an incoming channel for a specific edge
 func (p *Port) GetIncomingChannel(edge int) (error, chan interface{}) {
 	if len(p.Incoming) > edge {
 		return nil, p.Incoming[edge].Channel
@@ -53,6 +59,7 @@ func (p *Port) GetIncomingChannel(edge int) (error, chan interface{}) {
 	}
 }
 
+// GetValue awaits the value of a channel
 func (p *Port) GetValue() interface{} {
 	log.Println("awaiting value")
 	return <-p.Incoming[0].Channel
