@@ -8,21 +8,29 @@ import (
 
 // Generic Port Interface
 type Port struct {
-	Parent   Node
-	Name     string
-	Type     reflect.Kind
-	HasValue bool
-	value    interface{}
-	Outgoing []Edge
-	Incoming []*Edge
-	Optional bool
+	Parent        Node
+	Name          string
+	Type          reflect.Kind
+	HasValue      bool
+	value         interface{}
+	Outgoing      []Edge
+	Incoming      []*Edge
+	Optional      bool
+	ResultChannel chan Result
+}
+
+type Result struct {
+	Id    string
+	Port  string
+	Value interface{}
 }
 
 // NewPort creates a new port
-func NewPort(parent Node, name string, kind reflect.Kind) Port {
+func NewPort(parent Node, name string, kind reflect.Kind, c chan Result) Port {
 	p := Port{Parent: parent, Name: name, Type: kind, HasValue: false}
 	p.Outgoing = []Edge{}
 	p.Incoming = []*Edge{}
+	p.ResultChannel = c
 	return p
 }
 
@@ -40,6 +48,7 @@ func (p *Port) AddIncomingEdge(e *Edge) {
 func (p *Port) SetValue(val interface{}) {
 	p.value = val
 	p.HasValue = true
+	p.ResultChannel <- Result{Id: p.Parent.GetId(), Port: p.Name, Value: val}
 	for _, e := range p.Outgoing {
 		e.Propagate(val)
 	}

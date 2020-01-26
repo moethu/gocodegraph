@@ -36,7 +36,7 @@ func GetComponents() []Comp {
 	for k, v := range typeRegistry {
 		instance := reflect.New(v)
 		n := instance.Interface().(node.Node)
-		n.Init()
+		n.Init(nil)
 		c := Comp{Name: k}
 		for _, p := range n.GetInputs() {
 			io := Io{Name: p.Name, Type: p.Type.String()}

@@ -82,8 +82,24 @@ func solve(c *gin.Context) {
 		return
 	}
 
-	// generate nodes
-	nodes := mapOperators(payload["operators"])
+	// initialize result channel
+	resultChannel := make(chan node.Result)
+
+	// at this point we can upgrade the connection to a websocket
+	/*
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		conn.EnableWriteCompression(true)
+	*/
+
+	// setup loop for receiving results from nodes
+	go resultStreamWriter(resultChannel)
+
+	// generate nodes resporint to results channel
+	nodes := mapOperators(resultChannel, payload["operators"])
 
 	// generate links
 	mapLinks(payload["links"], nodes)
@@ -95,27 +111,12 @@ func solve(c *gin.Context) {
 	// solve graph
 	core.Solve(ns, true)
 
-	// wait for graph to be solved (runs async)
-	// TODO: open websocket for results and stream live results to UI
-	time.Sleep(1)
-
-	// retrieve results
-	results := make(map[string]interface{})
-	for _, n := range ns {
-		var data []interface{}
-		for _, p := range n.GetOutputs() {
-			data = append(data, p.GetValue())
-		}
-		results[n.GetId()] = data
-	}
-
-	log.Println(results)
-	// TODO: collect result map from nodes and return
+	// TODO: upgrade to websocket.. becomes obsolete
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // mapOperators maps json operators to graph components
-func mapOperators(data interface{}) map[string]node.Node {
+func mapOperators(c chan node.Result, data interface{}) map[string]node.Node {
 	nodes := make(map[string]node.Node)
 	d := data.(map[string]interface{})
 	for id, operator := range d {
@@ -126,12 +127,24 @@ func mapOperators(data interface{}) map[string]node.Node {
 
 		n := components.MakeInstance("components." + prop["title"].(string))
 
-		n.Init()
+		n.Init(c)
 		mapPorts(in, n, true)
 		mapPorts(out, n, false)
 		nodes[id] = n
 	}
 	return nodes
+}
+
+// resultStreamWriter writes results from nodes to websocket
+func resultStreamWriter(c chan node.Result) {
+	msgcount := 0
+	for {
+		select {
+		case msg := <-c:
+			log.Println("channel:", msgcount, msg.Id, msg.Port, msg.Value)
+		}
+		msgcount++
+	}
 }
 
 // mapPorts maps json ports to graph ports

@@ -8,5 +8,5 @@ type Node interface {
 	GetOutput(i int) *Port
 	GetId() string
 	GetPosition() Location
-	Init()
+	Init(c chan Result)
 }

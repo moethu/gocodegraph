@@ -7,11 +7,11 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (n *Multiplication) Init() {
+func (n *Multiplication) Init(c chan node.Result) {
 	n.Id = uuid.NewV4().String()
-	p1 := node.NewPort(n, "a", reflect.Int)
-	p2 := node.NewPort(n, "b", reflect.Int)
-	p3 := node.NewPort(n, "result", reflect.Int)
+	p1 := node.NewPort(n, "a", reflect.Int, c)
+	p2 := node.NewPort(n, "b", reflect.Int, c)
+	p3 := node.NewPort(n, "result", reflect.Int, c)
 	n.Inputs = []node.Port{p1, p2}
 	n.Outputs = []node.Port{p3}
 }

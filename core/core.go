@@ -9,9 +9,9 @@ import (
 )
 
 // Init initializes all nodes
-func Init(nodes []node.Node) {
+func Init(c chan node.Result, nodes []node.Node) {
 	for _, n := range nodes {
-		n.Init()
+		n.Init(c)
 	}
 }
 

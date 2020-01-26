@@ -19,10 +19,10 @@ func (n *Number) Solve() {
 	n.Outputs[0].SetValue(n.Value)
 }
 
-func (n *Number) Init() {
+func (n *Number) Init(c chan node.Result) {
 	n.Value = 5
 	n.Id = uuid.NewV4().String()
-	p3 := node.NewPort(n, "constant", reflect.Int)
+	p3 := node.NewPort(n, "constant", reflect.Int, c)
 	n.Inputs = []node.Port{}
 	n.Outputs = []node.Port{p3}
 }
