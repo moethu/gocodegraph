@@ -26,6 +26,8 @@ type Client struct {
 
 	// Buffered channels messages.
 	write chan node.Result
+
+	expected int
 }
 
 // streamReader reads messages from the websocket
@@ -38,7 +40,6 @@ func (c *Client) streamReader() {
 	// SetPongHandler sets the handler for pong messages received from the peer.
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(readTimeout)); return nil })
 	for {
-		log.Println("test")
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
@@ -46,7 +47,7 @@ func (c *Client) streamReader() {
 			}
 			break
 		}
-		log.Println(message)
+
 		// deserialize and solve
 		var payload map[string]interface{}
 		err = json.Unmarshal(message, &payload)
@@ -54,9 +55,9 @@ func (c *Client) streamReader() {
 			log.Println(err)
 		}
 
-		log.Println(payload)
 		// generate nodes resporint to results channel
 		nodes := mapOperators(c.write, payload["operators"])
+		c.expected = len(nodes)
 
 		// generate links
 		mapLinks(payload["links"], nodes)
@@ -78,6 +79,7 @@ func (c *Client) streamWriter() {
 		ticker.Stop()
 		c.conn.Close()
 	}()
+	ctr := 0
 	for {
 		// Go’s select lets you wait on multiple channel operations.
 		// We’ll use select to await both of these values simultaneously.
@@ -97,6 +99,7 @@ func (c *Client) streamWriter() {
 			}
 			payload, _ := json.Marshal(message)
 			w.Write(payload)
+			ctr++
 
 			// Add queued messages to the current websocket message
 			n := len(c.write)
@@ -104,6 +107,12 @@ func (c *Client) streamWriter() {
 				x := <-c.write
 				p, _ := json.Marshal(x)
 				w.Write(p)
+				ctr++
+			}
+
+			if ctr >= c.expected {
+				w.Close()
+				return
 			}
 
 			if err := w.Close(); err != nil {
