@@ -4,7 +4,6 @@ import (
 	"reflect"
 
 	"github.com/moethu/gocodegraph/node"
-	uuid "github.com/satori/go.uuid"
 )
 
 type Number struct {
@@ -19,9 +18,9 @@ func (n *Number) Solve() {
 	n.Outputs[0].SetValue(n.Value)
 }
 
-func (n *Number) Init(c chan node.Result) {
+func (n *Number) Init(c chan node.Result, id string) {
+	n.Id = id
 	n.Value = 5
-	n.Id = uuid.NewV4().String()
 	p3 := node.NewPort(n, "constant", reflect.Int, c)
 	n.Inputs = []node.Port{}
 	n.Outputs = []node.Port{p3}

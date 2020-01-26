@@ -6,11 +6,10 @@ import (
 	"reflect"
 
 	"github.com/moethu/gocodegraph/node"
-	uuid "github.com/satori/go.uuid"
 )
 
-func (n *Addition) Init(c chan node.Result) {
-	n.Id = uuid.NewV4().String()
+func (n *Addition) Init(c chan node.Result, id string) {
+	n.Id = id
 	p1 := node.NewPort(n, "a", reflect.Int, c)
 	p2 := node.NewPort(n, "b", reflect.Int, c)
 	p3 := node.NewPort(n, "result", reflect.Int, c)

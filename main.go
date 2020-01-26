@@ -14,7 +14,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/moethu/gocodegraph/components"
-	"github.com/moethu/gocodegraph/core"
 	"github.com/moethu/gocodegraph/node"
 )
 
@@ -35,8 +34,8 @@ func main() {
 
 	router.Static("/static/", "./static/")
 	router.GET("/", home)
+	router.Any("/solver", serveWebsocket)
 	router.GET("/components", nodes)
-	router.POST("/solve", solve)
 	log.Println("Starting HTTP Server on Port 8000")
 
 	go func() {
@@ -70,51 +69,6 @@ func home(c *gin.Context) {
 	viewertemplate.Execute(c.Writer, "http://localhost:8000")
 }
 
-// solve solves the graph based on a json input
-// TODO: minimalize input from UI
-func solve(c *gin.Context) {
-	var payload map[string]interface{}
-	bdata, _ := c.GetRawData()
-	err := json.Unmarshal(bdata, &payload)
-	if err != nil {
-		log.Println(err)
-		c.JSON(500, gin.H{"error": "error deserializing json"})
-		return
-	}
-
-	// initialize result channel
-	resultChannel := make(chan node.Result)
-
-	// at this point we can upgrade the connection to a websocket
-	/*
-		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		conn.EnableWriteCompression(true)
-	*/
-
-	// setup loop for receiving results from nodes
-	go resultStreamWriter(resultChannel)
-
-	// generate nodes resporint to results channel
-	nodes := mapOperators(resultChannel, payload["operators"])
-
-	// generate links
-	mapLinks(payload["links"], nodes)
-	ns := []node.Node{}
-	for _, value := range nodes {
-		ns = append(ns, value)
-	}
-
-	// solve graph
-	core.Solve(ns, true)
-
-	// TODO: upgrade to websocket.. becomes obsolete
-	c.JSON(200, gin.H{"status": "OK"})
-}
-
 // mapOperators maps json operators to graph components
 func mapOperators(c chan node.Result, data interface{}) map[string]node.Node {
 	nodes := make(map[string]node.Node)
@@ -127,24 +81,12 @@ func mapOperators(c chan node.Result, data interface{}) map[string]node.Node {
 
 		n := components.MakeInstance("components." + prop["title"].(string))
 
-		n.Init(c)
+		n.Init(c, id)
 		mapPorts(in, n, true)
 		mapPorts(out, n, false)
 		nodes[id] = n
 	}
 	return nodes
-}
-
-// resultStreamWriter writes results from nodes to websocket
-func resultStreamWriter(c chan node.Result) {
-	msgcount := 0
-	for {
-		select {
-		case msg := <-c:
-			log.Println("channel:", msgcount, msg.Id, msg.Port, msg.Value)
-		}
-		msgcount++
-	}
 }
 
 // mapPorts maps json ports to graph ports

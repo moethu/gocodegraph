@@ -1,5 +1,7 @@
 components = {}
 
+var ws;
+
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0,
@@ -70,17 +72,44 @@ function load() {
     });
 
     $("#solve").click(function () {
-        var widget = $("#example").data("flowchart-flowchart");
-        result = {}
-        for (var field in widget.data) {
-            if (widget.data.hasOwnProperty(field)) {
-                var name = widget.data[field];
-                result[field] = name;
-            }
+        if (ws) {
+            return false;
         }
-        let djson = JSON.stringify(result);
-        $.post("./solve", djson, function (data, status) {
-            console.log("Data: " + data + "\nStatus: " + status);
-        });
+
+        ws = new WebSocket(`ws://localhost:8000/solver`);
+        var widget = $("#example").data("flowchart-flowchart");
+
+        ws.onopen = function(evt) {
+            console.log("Connected to Server");
+            
+            result = {}
+            for (var field in widget.data) {
+                if (widget.data.hasOwnProperty(field)) {
+                    var name = widget.data[field];
+                    result[field] = name;
+                }
+            }
+            let djson = JSON.stringify(result);
+            console.log(djson)
+            ws.send(djson)
+        }
+
+        ws.onclose = function(evt) {
+			console.log("Closed Connection");
+            ws = null;
+        }
+        
+        ws.onmessage = function(evt) {
+            console.log(evt.data)
+            data = JSON.parse(evt.data);
+            widget.data.operators[data.Id].internal.properties.outputs[data.Port].label = data.Value.toString()
+            widget.setOperatorData(data.Id,widget.data.operators[data.Id]);
+        }
+
+        ws.onerror = function(evt) {
+            console.log("Error: " + evt.data);
+        }
+        return false;
+
     });
 }
