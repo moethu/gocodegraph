@@ -14,7 +14,11 @@ var typeRegistry = make(map[string]reflect.Type)
 // InitTypeRegistry loads all available nodes into the registry
 // TODO: should use reflection to get implemented types
 func InitTypeRegistry() {
-	myTypes := []interface{}{Addition{}, Multiplication{}, Number{}}
+	myTypes := []interface{}{
+		Addition{},
+		Multiplication{},
+		Number{},
+	}
 	for _, v := range myTypes {
 		log.Println("Loading", reflect.TypeOf(v))
 		typeRegistry[fmt.Sprintf("%T", v)] = reflect.TypeOf(v)
