@@ -75,6 +75,10 @@ func (p *Port) GetValue() interface{} {
 
 // AwaitValue awaits the value of a channel
 func (p *Port) AwaitValue() interface{} {
-	log.Println("awaiting value")
-	return <-p.Incoming[0].Channel
+	err, c := p.GetIncomingChannel(0)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+	return <-c
 }

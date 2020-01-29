@@ -9,11 +9,11 @@ import (
 )
 
 // Init initializes all nodes
-//func Init(c chan node.Result, nodes []node.Node) {
-//	for _, n := range nodes {
-//		n.Init(c)
-//	}
-//}
+func Init(c chan node.Result, nodes []node.Node) {
+	for _, n := range nodes {
+		n.Init(c, "")
+	}
+}
 
 // printNode helps to print the definition and values of a node
 func printNode(n node.Node) {

@@ -9,4 +9,5 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/satori/uuid v1.2.0 // indirect
 	golang.org/x/exp v0.0.0-20190919035709-81c71964d733
+	golang.org/x/tools v0.0.0-20200125223703-d33eef8e6825
 )

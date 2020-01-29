@@ -1,7 +1,5 @@
 package node
 
-import "log"
-
 type Edge struct {
 	From    *Port
 	To      *Port
@@ -18,7 +16,6 @@ func NewEdge(from *Port, to *Port) {
 
 // Propagates the value from the start to the end of the edge
 func (e *Edge) Propagate(val interface{}) {
-	log.Println("Pushing Value to Channel:", val)
 	// push value down the channel
 	e.Channel <- val
 }
