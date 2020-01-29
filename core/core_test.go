@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"log"
@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/moethu/gocodegraph/components"
-	"github.com/moethu/gocodegraph/core"
 	"github.com/moethu/gocodegraph/node"
 )
 
@@ -29,7 +28,7 @@ func TestGraphModelWithNodes(t *testing.T) {
 	node.NewEdge(n2.GetOutput(0), mul.GetInput(1))
 
 	nodes := []node.Node{&n1, &n2, &add, &mul}
-	core.Solve(nodes, false)
+	Solve(nodes, false)
 
 	expectations := make(map[string]int)
 	expectations["*"] = 25
